@@ -1,7 +1,7 @@
 Regex Bytecode Compiler
 =======================
 
-This module turns regular expressions into bytecode for execution on the virtual machine invented by Ken Thomson and (described by Russ Cox)[http://swtch.com/~rsc/regexp/]. It also produces a [Graphviz](http://www.graphviz.org/) representation of the abstract syntax tree (with some nodes removed).
+This module turns regular expressions into bytecode for execution on the virtual machine invented by Ken Thomson and [described by Russ Cox](http://swtch.com/~rsc/regexp/). It also produces a [Graphviz](http://www.graphviz.org/) representation of the abstract syntax tree (with some nodes removed).
 
 Dire Warning
 ------------
