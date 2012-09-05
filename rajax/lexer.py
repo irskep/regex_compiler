@@ -8,7 +8,7 @@ A bare-bones lexer. Most of the heavy lifting is done by the parser due to limit
 # ()|+*?[^]
 
 import ply.lex as lex
-import const
+
 
 states = (
   ('brackexpr','exclusive'),   # bracket expression
@@ -47,12 +47,12 @@ def t_BACKSLASH(t):
     r"\\"
     t.lexer.in_brack_expr = False
     t.lexer.push_state('escseq')
-    
+
     # TRICKY THING: Since we are cloning the lexer, the next token is going to
     # cause a state to be popped off of the stach which is *shared by both*.
     # So I'll just push it twice.
     t.lexer.push_state('escseq')
-    
+
     scout = t.lexer.clone()
     scout.plunk = 'a'
     t.lexer.plunk = 'b'

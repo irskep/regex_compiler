@@ -1,21 +1,40 @@
 """
-Parser using a grammar mostly derived from the U{1997 Single UNIX Specification<http://opengroup.org/onlinepubs/007908775/xbd/re.html>}
+Parser using a grammar mostly derived from the `1997 Single UNIX Specification
+<http://opengroup.org/onlinepubs/007908775/xbd/re.html>`_
 """
+from __future__ import absolute_import
 
-# Steve Johnson, January 2009
-# steve.johnson.public@gmail.com
+import logging
 
 import ply.yacc as yacc
 
-from lexer import *
-from ast import *
-from instructions import *
-from const import *
+from rajax.ast import (
+    ASTNode,
+    BrackExprListNode,
+    CharClassNode,
+    EndRangeNode,
+    NonDupReNode,
+    RangeExprNode,
+    RegexNode,
+    SimpleReNode
+)
+from rajax.const import (
+    char_classes_m,
+    char_classes_nm,
+    str_esc_seq,
+    WILDCARD
+)
+from rajax.lexer import tokens
+tokens
+
+
+log = logging.getLogger(__name__)
+
 
 # (some\\one)?and *(my)+ d|og
 
 # Print debug info during parsing
-debug = False
+debug = True
 
 # If True, AST will contain *all* productions. Otherwise it is progressively collapsed.
 full_graph = False
@@ -23,12 +42,12 @@ full_graph = False
 def parse(s, fg=False):
     """
     Parse a string into an AST
-    
-    @param s: A regular expression
-    @param fg: If True, an AST node is generated for every production.
-    
-    @return: Root of the AST
-    @rtype: L{ASTNode}
+
+    :param s: A regular expression
+    :param fg: If True, an AST node is generated for every production.
+
+    :return: Root of the AST
+    :rtype: :py:class:`rajax.ast.ASTNode`
     """
     global full_graph
     full_graph = fg
@@ -285,5 +304,4 @@ def p_special_escape(p):
 def p_error(p):
     raise TypeError("unknown text at %r" % (p.value,))
 
-parser = yacc.yacc(debug=0)
-
+parser = yacc.yacc(debug=debug)

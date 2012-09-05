@@ -1,13 +1,11 @@
 """
-Convert a tree of nodes following the L{Node} interface into a graphviz document
+Convert a tree of nodes following the :py:class:`rajax.ast.Node` interface into
+a graphviz document
 """
 
 # Steve Johnson, January 2009
 # steve.johnson.public@gmail.com
 
-import subprocess
-import sys
- 
 header_string =         "digraph %s {\n    node [shape=box];\n"
 subgraph_prefix =       "    {\n        rank=same; \n"
 node_string_nocolor =   "        %s [label=\"%s\"];\n"
@@ -20,51 +18,67 @@ class Node(object):
     """
     Example node class with the proper attributes
     
-    @ivar graph_id: Leave blank
-    @ivar string: Text to put on node label
-    @ivar children: C{[Node,]}
-    @ivar graph_color: If present, should be a color such as C{"#ffffff"} to be used as the node background color
+    .. py:attribute: graph_id
+
+        Leave blank
+
+    .. py:attribute: string
+    
+        Text to put on node label
+
+    .. py:attribute: children
+    
+        ``[Node, ...]``
+
+    .. py:attribute: graph_color
+    
+        If present, should be a color such as ``#ffffff`` to be used as the
+        node background color
+
     """
     def __init__(self, string, children=[]):
         super(Node, self).__init__()
         self.graph_id = ""
         self.string = string
         self.children = children
-    
+
     def __str__(self):
         return self.string
  
+
 node_count = 0
  
+
 def ast_walk_tree(node, rank, subgraph_list=[]):
     global node_count
     node_count += 1
     node.graph_id = str(node_count)
-    
+
     if len(subgraph_list)-1 < rank:
         subgraph_list.append([])
-        
+
     subgraph_list[rank].append(node)
-    
+
     for child in node.children:
         ast_walk_tree(child, rank+1, subgraph_list)
-        
+
     return subgraph_list
- 
+
+
 def ast_dot(root, path, name="AST"):
     """
     Convert a tree of nodes following the L{Node} interface into a graphviz document
-    
+
     @param root: Root node
     @param path: Path to the output file
     @param name: Name of the graph (optional)
     """
     f = open(path, 'w')
     f.write(header_string % name)
-    
+
     global node_count
     node_count = 0
-    
+
     subgraph_list = ast_walk_tree(root, 0, [])
     for subgraph in subgraph_list:
         f.write(subgraph_prefix)
@@ -74,7 +88,7 @@ def ast_dot(root, path, name="AST"):
             else:
                 f.write(node_string_nocolor % (node.graph_id, str(node)))
         f.write(subgraph_postfix)
-    
+
     for subgraph in subgraph_list:
         for node in subgraph:
             for child in node.children:

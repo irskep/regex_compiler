@@ -1,32 +1,36 @@
 """
 Classes and functions for working with VM instructions
 """
+from __future__ import absolute_import
 
-# Steve Johnson, January 2009
-# steve.johnson.public@gmail.com
+from rajax.const import (
+    INF,
+    WILDCARD,
+    cmd_to_opcode,
+    opcode_to_cmd,
+)
 
-from const import *
 
 class Instruction(object):
     """Represents a single VM instruction with a command and two optional arguments"""
-    
+
     def __init__(self, cmd, arg1=None, arg2=None):
         self.cmd = cmd
         self.arg1 = arg1
         self.arg2 = arg2
-    
+
     def to_opcode(self):
         """
         Alias for L{make_opcode}
         """
         return make_opcode(self.cmd, self.arg1, self.arg2)
-    
+
     def __repr__(self):
         return str(self)
-    
+
     def __str__(self):
         return str((self.cmd, self.arg1, self.arg2))
-    
+
 
 def _range_intersect(a1, a2, b1, b2):
     # (0, 10), (10, 20): (10, 10)
@@ -89,11 +93,11 @@ def transform_classes(classes, excludes):
 def make_opcode(cmd, arg1, arg2=None):
     """
     Convert an Instruction to an opcode tuple.
-    
+
     Converts cmd to an opcode, converts arg1 and arg2 to ints (zero if None, 
     ord(c) if character), and return as a tuple
-    
-    @rtype: C{(opcode, arg1, arg2)}
+
+    :rtype: ``(opcode, arg1, arg2)``
     """
     arg1 = ord(arg1) if isinstance(arg1, str) else arg1 or 0
     arg2 = ord(arg2) if isinstance(arg2, str) else arg2 or 0
@@ -102,7 +106,7 @@ def make_opcode(cmd, arg1, arg2=None):
 def serialize(instr_list):
     """
     Convert a list of instructions into a list of opcode tuples
-    
+
     @rtype: C{[(opcode, arg1, arg2),]}
     """
     return [make_opcode(i.cmd, i.arg1, i.arg2) for i in instr_list]
@@ -110,8 +114,8 @@ def serialize(instr_list):
 def prettyprint_program(opcode_list):
     """
     Print a formatted list of the entire program in human-readable form
-    
-    @param opcode_list: A list of opcode tuples, probably returned by compiler.parse()
+
+    :param opcode_list: A list of opcode tuples, probably returned by compiler.parse()
     """
     instr_list = []
     specials = {INF: 'INF', WILDCARD: 'WILD', 0: 'ZERO'}
@@ -131,7 +135,6 @@ def prettyprint_program(opcode_list):
         instr_list.append(i)
     j = 0
     s1 = len(str(len(instr_list))) #yeah, I know, cheap
-    s2 = max([i.arg1 for i in instr_list])
     for i in instr_list:
         if i.arg2:
             print "%s: %s %3s %3s" % (str(j).rjust(s1), i.cmd.ljust(5), 
