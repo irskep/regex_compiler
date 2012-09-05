@@ -52,12 +52,11 @@ def show(s, reduced=True, out_path="AST", make_pdf=True,
     visualize.ast_dot(root, "%s.dot" % out_path)
     log.info("Graphviz written to %s.dot" % out_path)
     if make_pdf:
-        return_code = subprocess.call(["dot", "-Tpdf",  "%s.dot" % out_path,
-                                       "-o",  "%s.pdf" % out_path])
-
-        if return_code == 0:
+        try:
+            subprocess.call(["dot", "-Tpdf",  "%s.dot" % out_path,
+                             "-o",  "%s.pdf" % out_path])
             log.info("PDF written to %s.pdf" % out_path)
-        else:
+        except OSError:
             log.info("PDF could not be written, Graphviz does not appear to be"
                      " installed")
 
