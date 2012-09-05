@@ -1,23 +1,24 @@
-Regex Bytecode Compiler
-=======================
+Rajax: Regex Bytecode Compiler
+==============================
 
-This module turns regular expressions into bytecode for execution on the virtual machine invented by Ken Thomson and [described by Russ Cox](http://swtch.com/~rsc/regexp/). It also produces a [Graphviz](http://www.graphviz.org/) representation of the abstract syntax tree (with some nodes removed).
+This module turns regular expressions into bytecode for execution on the
+virtual machine invented by Ken Thompson and [described by Russ
+Cox](http://swtch.com/~rsc/regexp/). It also produces a
+[Graphviz](http://www.graphviz.org/) representation of the abstract syntax tree
+(with some nodes removed).
 
-Dire Warning
-------------
-This is intended to be *example code only*. It is part of the unreleased [SourceQL project](http://timunionsteve.posterous.com/mercurial-ate-our-breakfast-but-we-dont-mind). The docstrings are written in [epydoc](http://epydoc.sourceforge.net/) format which went out of style years ago.
-
-Some of the VM instructions (`NCHAR`, `WILD`) are not documented by Cox. `NCHAR` means "match anything but this" and `WILD` is the wildcard.
+Some of the VM instructions (`NCHAR`, `WILD`) are not documented by Cox.
+`NCHAR` means "match anything but this" and `WILD` is the wildcard.
 
 Usage
 -----
 
-    python __init__.py [regex]
+    python -m rajax [regex]
 
 Example
 -------
 
-    python __init__.py ab[\D8]+
+    python -m rajax ab[\D8]+
     
     Tokens:
     'ORD_CHAR' 'a'
