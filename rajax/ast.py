@@ -201,7 +201,7 @@ class SimpleReNode(ASTNode):
         if self.subtype == 'dup':
             self.graph_color = "#ccffcc"
 
-
+    def generate_instructions(self, instr_list=None, flags=None):
         """
         Generate code for a +, *, or ? operator if ``subtype == 'dup'``.
 
@@ -225,8 +225,8 @@ class SimpleReNode(ASTNode):
             L2:
 
         """
-        instr_list = []
-        flags = {}
+        instr_list = instr_list or []
+        flags = flags or {}
         if self.subtype == 'dup':
             lchild = self.children[0]
             if self.data == '+':
