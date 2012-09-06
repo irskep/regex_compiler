@@ -118,7 +118,7 @@ def prettyprint_program(opcode_list):
     :param opcode_list: A list of opcode tuples, probably returned by compiler.parse()
     """
     instr_list = []
-    specials = {INF: 'INF', WILDCARD: 'WILD', 0: 'ZERO'}
+    specials = {INF: 'INF', WILDCARD: 'WILD', 0: ''}
     for o in opcode_list:
         i = Instruction(opcode_to_cmd[o[0]], o[1], o[2])
         if i.cmd == 'char':
