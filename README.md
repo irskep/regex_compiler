@@ -15,6 +15,11 @@ Usage
 
     python -m rajax [regex]
 
+Install
+-------
+
+    pip install -e git+https://github.com/cwru-compilers/regex_compiler.git#egg=rajax
+
 Example
 -------
 
