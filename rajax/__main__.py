@@ -22,7 +22,6 @@ import visualize
 
 log = logging.getLogger(__name__)
 
-
 def show(s, reduced=True, out_path="AST", make_pdf=True,
               print_tokens=False, print_instructions=False):
     """
@@ -85,9 +84,10 @@ def parse(s):
 
 if __name__ == "__main__":
     import sys
+    parser.debug = False
     if len(sys.argv) == 2:
         expr = sys.argv[1]
-        show(expr, print_instructions=True, print_tokens=True)
+        show(expr, print_instructions=True, print_tokens=False)
     else:
         print >> sys.stderr, "Usage: python __init__.py [regex]"
 
