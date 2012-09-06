@@ -145,3 +145,4 @@ def prettyprint_program(opcode_list):
         else:
             print "%s: %s" % (str(j).rjust(s1), i.cmd.ljust(5))
         j += 1
+
