@@ -24,6 +24,7 @@ import parser
 import visualize
 from rajax.const import opcode_to_cmd
 
+__version__ = 0.1
 
 error_codes = {
     'usage':1,
@@ -141,7 +142,7 @@ def main(args):
     try:
         opts, args = getopt(args, short_opts, long_opts)
     except GetoptError, err:
-        logger.error(err)
+        _log(err)
         usage(error_codes['option'])
 
     json = False
@@ -154,7 +155,7 @@ def main(args):
             json = True
 
     if len(args) != 1:
-        logger.error("Expected exactly 1 regex got %d args" % len(args))
+        _log("Expected exactly 1 regex got %d args" % len(args))
         usage(error_codes['option'])
 
     show(args[0], print_json=json, make_pdf=False, print_tokens=False)
