@@ -9,14 +9,12 @@ The allowed operators are ?, +, *, (), and escape sequences for those
 characters. No other escape sequences are supported.
 """
 
-import sys
-import logging
-import subprocess
 import json
-from getopt import getopt, GetoptError
-
-logging.basicConfig()
-log = logging.getLogger(__name__)
+import logging
+import optparse
+import os
+import subprocess
+import sys
 
 import instructions
 import lexer
@@ -24,58 +22,14 @@ import parser
 import visualize
 from rajax.const import opcode_to_cmd
 
-__version__ = 0.1
 
-error_codes = {
-    'usage':1,
-    'file_not_found':2,
-    'option':3,
-    'args':4,
-    'version':5,
-    'database':6
-}
-
-usage_message = \
-'''usage: python -m rajax [flags] <regex>'''
-
-extended_message = \
-    '''
-Compile a regex into NFA instructions.
-
-Options
-
-    -h, help                            print this message
-    -v, version                         print the version
-    -j, json                            emit json instead of text
-'''
+log = logging.getLogger(__name__)
 
 
-def _log(*msgs):
-    for msg in msgs:
-        print >>sys.stderr, msg,
-    print >>sys.stderr
-    sys.stderr.flush()
-
-def version():
-    '''Print version and exits'''
-    _log('version :', __version__)
-    sys.exit(error_codes['version'])
-
-def usage(code=None):
-    ''' Prints the usage and exits with an error code specified by code. If code
-    is not given it exits with error_codes['usage']'''
-    _log(usage_message)
-    if code is None:
-        _log(extended_message)
-        code = error_codes['usage']
-    sys.exit(code)
-
-def show(s, reduced=True, out_path="AST", make_pdf=True,
-              print_tokens=False, print_json=False):
-    """
-
-    Generates a graphviz diagram of the AST for the given path. Since this is
-    mostly debug functionality, there are also options to print various
+def show(s, reduced=True, dot_path=None, pdf_path=None, print_tokens=False,
+         fmt='pretty'):
+    """Generates a graphviz diagram of the AST for the given path. Since this
+    is mostly debug functionality, there are also options to print various
     significant values.
 
     :param s: The regular expression to parse
@@ -88,38 +42,43 @@ def show(s, reduced=True, out_path="AST", make_pdf=True,
     :param print_tokens: Print the tokens as seen by the lexer to the console
     :param json: Print json to the console instead of text
     """
-    if print_tokens:
+    ALLOWED_FORMATS = ('pretty', 'json')
+    if fmt not in ALLOWED_FORMATS:
+        raise ValueError('fmt must be one of %r' % ALLOWED_FORMATS)
+
+    log.info('dot path: %s' % dot_path)
+
+    if fmt == 'pretty':
         log.info('Tokens:')
         lexer.lexer.input(s)
         for tok in iter(lexer.lexer.token, None):
             log.info(repr(tok.type), repr(tok.value))
     root = parser.parse(s, (not reduced))
 
-    if make_pdf:
-        visualize.ast_dot(root, "%s.dot" % out_path)
-        log.info("Graphviz written to %s.dot" % out_path)
+    if pdf_path:
+        visualize.ast_dot(root, dot_path)
+        log.info("Graphviz written to %s" % dot_path)
         try:
-            subprocess.call(["dot", "-Tpdf",  "%s.dot" % out_path,
-                             "-o",  "%s.pdf" % out_path])
-            log.info("PDF written to %s.pdf" % out_path)
+            subprocess.call(["dot", "-Tpdf",  dot_path, "-o",  pdf_path])
+            log.info("PDF written to %s" % pdf_path)
         except OSError:
             log.info("PDF could not be written, Graphviz does not appear to be"
                      " installed")
 
     instr_list = root.generate_instructions()
     instr_list.append(instructions.Instruction('match'))
-    # Print instructions after the AST is drawn in case instruction printing fails
+    # Print instructions after the AST is drawn in case instruction printing
+    # fails
     program = instructions.serialize(instr_list)
 
-    if print_json:
-        program = [
-            (opcode_to_cmd[inst[0]].upper(), inst[1], inst[2])
-            for inst in program
-        ]
+    if fmt == 'json':
+        program = [(opcode_to_cmd[inst[0]].upper(), inst[1], inst[2])
+                   for inst in program]
         json.dump(program, sys.stdout)
-    else:
+    elif fmt == 'pretty':
         log.info("Instructions for VM:")
         instructions.prettyprint_program(program)
+
 
 def parse(s):
     """
@@ -132,35 +91,38 @@ def parse(s):
     instr_list.append(instructions.Instruction('match'))
     return instructions.serialize(instr_list)
 
+
 def main(args):
+    p = optparse.OptionParser('Compile a regular expression into NFA'
+                              ' instructions')
+    p.add_option('-d', '--dot', help='Write the AST as a Graphviz dot file')
+    p.add_option('-f', '--format', default='pretty',
+                 help='Output format, either "pretty" or "json"')
+    p.add_option('-j', '--json', action='store_true',
+                 help='Alias for --format=json')
+    p.add_option('-p', '--pdf', help=('Write the AST as a PDF file. Implies'
+                                      ' --dot=FILENAME.dot.'))
+    p.add_option('-v', '--verbose', action='store_true',
+                 help='Print debugging information')
 
-    short_opts =  'hvj'
-    long_opts = [
-        'help', 'version', 'json'
-    ]
+    opts, args = p.parse_args()
 
-    try:
-        opts, args = getopt(args, short_opts, long_opts)
-    except GetoptError, err:
-        _log(err)
-        usage(error_codes['option'])
-
-    json = False
-    for opt, arg in opts:
-        if opt in ('-h', '--help'):
-            usage()
-        elif opt in ('-v', '--version'):
-            version()
-        elif opt in ('-j', '--json'):
-            json = True
+    logging.basicConfig(level=logging.INFO if opts.verbose
+                        else logging.WARNING)
 
     if len(args) != 1:
-        _log("Expected exactly 1 regex got %d args" % len(args))
-        usage(error_codes['option'])
+        p.error('You must specify exactly one regular expression.')
 
-    show(args[0], print_json=json, make_pdf=False, print_tokens=False)
+    if opts.pdf and not opts.dot:
+        dot_path = '%s.dot' % os.path.splitext(opts.pdf)[0]
+    else:
+        dot_path = opts.dot
+
+    fmt = 'json' if opts.json else opts.format
+
+    show(args[0], fmt=fmt.lower(), pdf_path=opts.pdf, dot_path=dot_path)
+
 
 if __name__ == "__main__":
     parser.debug = False
     main(sys.argv[1:])
-

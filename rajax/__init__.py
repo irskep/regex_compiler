@@ -14,3 +14,4 @@ import lexer
 import parser
 import visualize
 
+__version__ = 0.
