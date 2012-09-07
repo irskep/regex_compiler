@@ -101,7 +101,7 @@ def parse(s):
 def main(args=None):
     p = optparse.OptionParser(
         description='Compile a regular expression into NFA instructions',
-        usage='rajax expr [opts]')
+        usage='%prog expr [opts]')
     p.add_option('-d', '--dot', help='Write the AST as a Graphviz dot file')
     p.add_option('-f', '--format', default='pretty',
                  help='Output format, either "pretty" or "json"')
