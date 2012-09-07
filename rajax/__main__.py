@@ -26,8 +26,7 @@ from rajax.const import opcode_to_cmd
 log = logging.getLogger(__name__)
 
 
-def show(s, reduced=True, dot_path=None, pdf_path=None, print_tokens=False,
-         fmt='pretty'):
+def show(s, reduced=True, dot_path=None, pdf_path=None, fmt='pretty'):
     """Generates a graphviz diagram of the AST for the given path. Since this
     is mostly debug functionality, there are also options to print various
     significant values.
