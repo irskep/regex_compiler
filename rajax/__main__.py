@@ -55,15 +55,16 @@ def show(s, reduced=True, dot_path=None, pdf_path=None, print_tokens=False,
             log.info(repr(tok.type), repr(tok.value))
     root = parser.parse(s, (not reduced))
 
-    if pdf_path:
+    if dot_path:
         visualize.ast_dot(root, dot_path)
         log.info("Graphviz written to %s" % dot_path)
-        try:
-            subprocess.call(["dot", "-Tpdf",  dot_path, "-o",  pdf_path])
-            log.info("PDF written to %s" % pdf_path)
-        except OSError:
-            log.info("PDF could not be written, Graphviz does not appear to be"
-                     " installed")
+        if pdf_path:
+            try:
+                subprocess.call(["dot", "-Tpdf",  dot_path, "-o",  pdf_path])
+                log.info("PDF written to %s" % pdf_path)
+            except OSError:
+                log.info("PDF could not be written. Graphviz does not appear"
+                         " to be installed.")
 
     instr_list = root.generate_instructions()
     instr_list.append(instructions.Instruction('match'))
