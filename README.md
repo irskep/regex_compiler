@@ -13,7 +13,19 @@ Some of the VM instructions (`NCHAR`, `WILD`) are not documented by Cox.
 Usage
 -----
 
-    python -m rajax [regex]
+```
+Usage: Compile a regular expression into NFA instructions
+
+Options:
+  -h, --help            show this help message and exit
+  -d DOT, --dot=DOT     Write the AST as a Graphviz dot file
+  -f FORMAT, --format=FORMAT
+                        Output format, either "pretty" or "json"
+  -j, --json            Alias for --format=json
+  -p PDF, --pdf=PDF     Write the AST as a PDF file. Implies
+                        --dot=FILENAME.dot.
+  -v, --verbose         Print debugging information
+```
 
 Install
 -------
