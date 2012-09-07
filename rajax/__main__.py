@@ -36,11 +36,9 @@ def show(s, reduced=True, dot_path=None, pdf_path=None, print_tokens=False,
     :param reduced: If True, includes only productions used for generating code
                     in the diagram. If False, includes all productions in the
                     diagram. Defaults to True.
-    :param out_path: Destination for the graphviz document without any
-                     extension
-    :param make_pdf: Also create a PDF using the local graphviz installation
-    :param print_tokens: Print the tokens as seen by the lexer to the console
-    :param json: Print json to the console instead of text
+    :param dot_path: Where to write dot file, if any
+    :param pdf_path: Where to write PDF file. Requires dot_file to also be set.
+    :param format: 'pretty' or 'json'
     """
     ALLOWED_FORMATS = ('pretty', 'json')
     if fmt not in ALLOWED_FORMATS:
@@ -52,7 +50,7 @@ def show(s, reduced=True, dot_path=None, pdf_path=None, print_tokens=False,
         log.info('Tokens:')
         lexer.lexer.input(s)
         for tok in iter(lexer.lexer.token, None):
-            log.info(repr(tok.type), repr(tok.value))
+            log.info('%r %r' % (tok.type, tok.value))
     root = parser.parse(s, (not reduced))
 
     if dot_path:
@@ -116,7 +114,8 @@ def main(args):
     opts, args = p.parse_args()
 
     logging.basicConfig(level=logging.INFO if opts.verbose
-                        else logging.WARNING)
+                        else logging.WARNING,
+                        format='%(message)s')
 
     if len(args) != 1:
         p.error('You must specify exactly one regular expression.')
