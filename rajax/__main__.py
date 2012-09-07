@@ -59,12 +59,19 @@ def show(s, reduced=True, dot_path=None, pdf_path=None, print_tokens=False,
         visualize.ast_dot(root, dot_path)
         log.info("Graphviz written to %s" % dot_path)
         if pdf_path:
+            pdf_path = os.path.abspath(pdf_path)
             try:
-                subprocess.call(["dot", "-Tpdf",  dot_path, "-o",  pdf_path])
+                p = subprocess.Popen(
+                    ["dot", "-Tpdf",  dot_path, "-o",  pdf_path],
+                    stderr=subprocess.PIPE,
+                    stdout=subprocess.PIPE)
+                _, stderr = p.communicate()
+                if p.returncode != 0:
+                    raise OSError(stderr)
                 log.info("PDF written to %s" % pdf_path)
             except OSError:
-                log.info("PDF could not be written. Graphviz does not appear"
-                         " to be installed.")
+                log.error("PDF could not be written. Graphviz does not appear"
+                          " to be installed or some other error occurred.")
 
     instr_list = root.generate_instructions()
     instr_list.append(instructions.Instruction('match'))
