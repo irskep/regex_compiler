@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Compile simple regular expressions to bytecode for hendersonvm.
 
@@ -97,7 +98,7 @@ def parse(s):
     return instructions.serialize(instr_list)
 
 
-def main(args):
+def main(args=None):
     p = optparse.OptionParser('Compile a regular expression into NFA'
                               ' instructions')
     p.add_option('-d', '--dot', help='Write the AST as a Graphviz dot file')
@@ -110,7 +111,7 @@ def main(args):
     p.add_option('-v', '--verbose', action='store_true',
                  help='Print debugging information')
 
-    opts, args = p.parse_args()
+    opts, args = p.parse_args(args)
 
     logging.basicConfig(level=logging.INFO if opts.verbose
                         else logging.WARNING,
@@ -126,9 +127,5 @@ def main(args):
 
     fmt = 'json' if opts.json else opts.format
 
-    show(args[0], fmt=fmt.lower(), pdf_path=opts.pdf, dot_path=dot_path)
-
-
-if __name__ == "__main__":
     parser.debug = False
-    main(sys.argv[1:])
+    show(args[0], fmt=fmt.lower(), pdf_path=opts.pdf, dot_path=dot_path)

@@ -23,6 +23,7 @@ setup(name='rajax',
       url='https://github.com/cwru-compilers/regex_compiler',
       packages=['rajax'],
       platforms=['unix'],
+      scripts=['bin/rajax'],
       **setuptools_kwargs
 )
 
