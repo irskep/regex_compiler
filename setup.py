@@ -1,6 +1,6 @@
 try:
     from setuptools import setup
-    setup # quiet "redefinition of unused ..." warning from pyflakes
+    setup  # quiet "redefinition of unused ..." warning from pyflakes
     # arguments that distutils doesn't understand
     setuptools_kwargs = {
         'install_requires': [
@@ -26,4 +26,3 @@ setup(name='rajax',
       scripts=['bin/rajax'],
       **setuptools_kwargs
 )
-
